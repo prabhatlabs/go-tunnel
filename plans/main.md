@@ -95,7 +95,7 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 
 ### Responsibilities
 1. Accept incoming HTTP requests from the public internet on one port (e.g. `:8080`)
-2. Accept exactly one WebSocket client connection on a separate path (e.g. `/tunnel`)
+2. Accept exactly one WebSocket client connection on a separate path (e.g. `/__tunnel__`)
 3. For each HTTP request:
    - Generate a unique request ID
    - Serialize request into a WS message
@@ -124,7 +124,7 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 ## Client — How It Works
 
 ### Responsibilities
-1. Connect to the server's `/tunnel` WebSocket endpoint with the shared secret header
+1. Connect to the server's `/__tunnel__` WebSocket endpoint with the shared secret header
 2. Maintain the connection (reconnect on disconnect with exponential backoff)
 3. Read request messages from the WS
 4. For each request, spin up a goroutine that:
@@ -139,7 +139,7 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 
 | Flag | Default | Description |
 |---|---|---|
-| `--server` | — | WebSocket server URL (e.g. `wss://myserver.onrender.com/tunnel`) |
+| `--server` | — | WebSocket server URL (e.g. `wss://myserver.onrender.com/__tunnel__`) |
 | `--port` | `3000` | Local port to forward to |
 | `--secret` | — | Shared secret for auth |
 
@@ -237,5 +237,5 @@ go build -o bin/client ./cmd/client
 ./bin/server --port 8080 --secret mysecret
 
 # Run client
-./bin/client --server wss://myapp.onrender.com/tunnel --port 3000 --secret mysecret
+./bin/client --server wss://myapp.onrender.com/__tunnel__ --port 3000 --secret mysecret
 ```
