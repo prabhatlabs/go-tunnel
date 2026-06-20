@@ -20,8 +20,8 @@ tunnel/
 │   └── client/
 │       └── main.go          # Client entrypoint
 ├── internal/
-│   ├── proto/
-│   │   └── message.go       # Shared WS message types
+│   └── protocol/
+│       └── types.go         # Shared WS message types
 │   ├── server/
 │   │   ├── server.go        # HTTP server + WS upgrade
 │   │   ├── tunnel.go        # WS tunnel manager
@@ -94,6 +94,7 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 ## Server — How It Works
 
 ### Responsibilities
+
 1. Accept incoming HTTP requests from the public internet on one port (e.g. `:8080`)
 2. Accept exactly one WebSocket client connection on a separate path (e.g. `/__tunnel__`)
 3. For each HTTP request:
@@ -106,16 +107,19 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 4. When a WS response message arrives, look up the channel by ID and send the response into it
 
 ### Concurrency model
+
 - Each incoming HTTP request is handled in its own goroutine (standard Go HTTP)
 - A single goroutine owns the WS write loop (gorilla/websocket is not concurrent-write-safe, so writes must be serialized)
 - A separate goroutine owns the WS read loop, dispatching responses to pending channels
 - Pending requests stored in a `sync.Map` keyed by request ID
 
 ### Only one client
+
 - If a client is already connected and another tries to connect → reject with `409`
 - On client disconnect, the server clears the active connection and returns `502` to any in-flight requests
 
 ### Timeout
+
 - Each HTTP request waiting for a tunnel response has a configurable timeout (default: 30s)
 - On timeout → `504 Gateway Timeout`
 
@@ -124,6 +128,7 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 ## Client — How It Works
 
 ### Responsibilities
+
 1. Connect to the server's `/__tunnel__` WebSocket endpoint with the shared secret header
 2. Maintain the connection (reconnect on disconnect with exponential backoff)
 3. Read request messages from the WS
@@ -144,6 +149,7 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 | `--secret` | — | Shared secret for auth |
 
 ### Reconnect strategy
+
 - On disconnect, wait and retry: 1s → 2s → 4s → 8s → max 30s
 - Log each reconnect attempt
 - No limit on retry count — it keeps trying until killed
