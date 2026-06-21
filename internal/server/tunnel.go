@@ -60,22 +60,24 @@ func (t *Tunnel) ReadLoop(onClose func()) {
 		case <-t.done:
 			return
 		default:
-			_, msg, err := t.conn.ReadMessage()
-			if err != nil {
-				return
-			}
-
-			var resp protocol.ResponseMessage
-			if err := resp.UnmarshalJSON(msg); err != nil {
-				continue
-			}
-			ch, ok := t.pending.Load(resp.ID)
-			if !ok {
-				continue
-			}
-			ch.(chan *protocol.ResponseMessage) <- &resp
-			t.pending.Delete(resp.ID)
 		}
+		_, msg, err := t.conn.ReadMessage()
+		if err != nil {
+			return
+		}
+
+		var resp protocol.ResponseMessage
+		if err := resp.UnmarshalJSON(msg); err != nil {
+			continue
+		}
+
+		ch, ok := t.pending.Load(resp.ID)
+		if !ok {
+			continue
+		}
+
+		ch.(chan *protocol.ResponseMessage) <- &resp
+		t.pending.Delete(resp.ID)
 	}
 }
 

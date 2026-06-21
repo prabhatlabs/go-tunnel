@@ -17,7 +17,7 @@ func (m *RequestMessage) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if m.Type != MsgTypeRequest {
-		return fmt.Errorf("invalid type for RequestMessage: %q", m.Type)
+		return fmt.Errorf("Invalid type for RequestMessage: %q", m.Type)
 	}
 	return nil
 }
@@ -34,7 +34,7 @@ func (m *ResponseMessage) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if m.Type != MsgTypeResponse {
-		return fmt.Errorf("invalid type for ResponseMessage: %q", m.Type)
+		return fmt.Errorf("Invalid type for ResponseMessage: %q", m.Type)
 	}
 	return nil
 }
