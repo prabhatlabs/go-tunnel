@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 	"sync"
 
@@ -34,7 +35,6 @@ func (t *Tunnel) Close() {
 
 	t.conn.Close()
 
-	close(t.writeCh)
 	t.pending.Range(func(k, value any) bool {
 		ch := value
 		resp := protocol.ResponseMessage{
@@ -46,18 +46,15 @@ func (t *Tunnel) Close() {
 		t.pending.Delete(k)
 		return true
 	})
-
-	// drain remaining(if there are any) writeCh
-	for {
-		select {
-		case <-t.writeCh:
-		default:
-			return
-		}
-	}
 }
 
-func (t *Tunnel) ReadLoop() {
+func (t *Tunnel) ReadLoop(onClose func()) {
+	defer func() {
+		if onClose != nil {
+			onClose()
+		}
+	}()
+
 	for {
 		select {
 		case <-t.done:
@@ -96,6 +93,12 @@ func (t *Tunnel) WriteLoop(msgCh <-chan []byte) {
 }
 
 func (t *Tunnel) SendRequest(req *protocol.RequestMessage) (<-chan *protocol.ResponseMessage, error) {
+	select {
+	case <-t.done:
+		return nil, errors.New("Tunnel closed")
+	default:
+	}
+
 	data, err := req.MarshalJSON()
 	if err != nil {
 		return nil, err
@@ -105,6 +108,11 @@ func (t *Tunnel) SendRequest(req *protocol.RequestMessage) (<-chan *protocol.Res
 	t.pending.Store(req.ID, ch)
 
 	// queue the request to be sent
-	t.writeCh <- data
+	select {
+	case <-t.done:
+		return nil, errors.New("Tunnel closed")
+	default:
+		t.writeCh <- data
+	}
 	return ch, nil
 }

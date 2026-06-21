@@ -59,8 +59,7 @@ func (s *Server) handleTunnel(w http.ResponseWriter, r *http.Request) {
 
 	s.tunnel = NewTunnel(ws)
 	s.mu.Unlock()
-	defer s.closeTunnel()
-	go s.tunnel.ReadLoop()
+	go s.tunnel.ReadLoop(s.closeTunnel)
 	go s.tunnel.WriteLoop(s.tunnel.writeCh)
 }
 
