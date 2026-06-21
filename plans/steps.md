@@ -25,11 +25,11 @@
 
 ## Phase 4 — Client (`cmd/client/` + `internal/client/`)
 
-- [ ] CLI flags: `--server`, `--port`, `--secret`
-- [ ] Connect to server WS with `X-Tunnel-Secret` header
-- [ ] WS read loop: receive requests, spawn handler goroutines
-- [ ] Request handler: reconstruct HTTP, forward to localhost, collect response
-- [ ] WS write loop: serialize responses back to server
+- [x] CLI flags: `--server`, `--port`, `--secret`
+- [x] Connect to server WS with `X-Tunnel-Secret` header
+- [x] WS read loop: receive requests, forward to localhost, send response
+- [x] Request handler: reconstruct HTTP, forward to localhost, collect response
+- [x] WS write loop: serialize responses back to server
 - [ ] Reconnect with exponential backoff (1s → 2s → 4s → 8s → max 30s)
 
 ## Phase 5 — Integration & Testing
