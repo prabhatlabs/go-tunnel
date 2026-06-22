@@ -1,12 +1,12 @@
 package client
 
 import (
-	"log"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/prabhatlabs/go-tunnel/internal/logging"
 	"github.com/prabhatlabs/go-tunnel/internal/protocol"
 )
 
@@ -58,7 +58,8 @@ func (c *Client) readLoop(conn *websocket.Conn, done chan struct{}, writeCh chan
 			continue
 		}
 
-		resp, err := httpRequestBuilderAndDoer(c.Port, &req)
+		logging.Info("Forwarding request", "id", req.ID, "method", req.Method, "path", req.Path)
+		resp, err := httpReqForwarder(c.Port, &req)
 		if err != nil {
 			continue
 		}
@@ -109,9 +110,10 @@ func (c *Client) Run() {
 	backoff := 1 * time.Second
 
 	for {
+		logging.Info("Connecting...")
 		conn, err := c.connect()
 		if err != nil {
-			log.Printf("connect failed: %v, retrying in %v", err, backoff)
+			logging.Warnf("Connection failed: %v, retrying in %v", err, backoff)
 			time.Sleep(backoff)
 			backoff *= 2
 			if backoff > 30*time.Second {
@@ -121,7 +123,7 @@ func (c *Client) Run() {
 		}
 
 		backoff = 1 * time.Second
-		log.Printf("connected to tunnel server")
+		logging.Info("Connected to tunnel server")
 
 		c.runSession(conn)
 	}

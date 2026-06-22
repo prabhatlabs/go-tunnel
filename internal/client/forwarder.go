@@ -9,7 +9,7 @@ import (
 	"github.com/prabhatlabs/go-tunnel/internal/protocol"
 )
 
-func httpRequestBuilderAndDoer(port int, req *protocol.RequestMessage) (*protocol.ResponseMessage, error) {
+func httpReqForwarder(port int, req *protocol.RequestMessage) (*protocol.ResponseMessage, error) {
 	baseUrl := "http://localhost:" + strconv.Itoa(port)
 	url := baseUrl + req.Path
 	client := &http.Client{}
@@ -48,20 +48,3 @@ func httpRequestBuilderAndDoer(port int, req *protocol.RequestMessage) (*protoco
 
 	return resp, nil
 }
-
-// func (c *Client) forwarder(req *protocol.RequestMessage) (<-chan *protocol.ResponseMessage, error) {
-// 	resp, err := httpRequestBuilderAndDoer(c.Port, req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	ch := make(chan *protocol.ResponseMessage, 1)
-// 	c.pending.Store(req.ID, ch)
-
-// 	select {
-// 	case ch <- resp:
-// 		return ch, nil
-// 	default:
-// 		return nil, errors.New("Pending request limit exceeded")
-// 	}
-// }

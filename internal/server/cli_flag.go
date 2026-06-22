@@ -2,7 +2,8 @@ package server
 
 import (
 	"flag"
-	"log"
+
+	"github.com/prabhatlabs/go-tunnel/internal/logging"
 )
 
 func GetFlags() (int, string) {
@@ -14,11 +15,11 @@ func GetFlags() (int, string) {
 	secret := *secretPtr
 
 	if port < 1 || port > 65535 {
-		log.Fatalln("Port must be between 1 and 65535")
+		logging.Error("Port must be between 1 and 65535")
 	}
 
 	if secret == "" {
-		log.Fatalln("Secret must be provided")
+		logging.Error("Secret must be provided")
 	}
 
 	return port, secret
