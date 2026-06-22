@@ -12,7 +12,5 @@ func main() {
 
 	log.Printf("forwarding port :%d", port)
 
-	if err := c.Run(); err != nil {
-		log.Fatal(err)
-	}
+	c.Run()
 }
