@@ -35,7 +35,7 @@ func (s *Server) handleProxy(w http.ResponseWriter, r *http.Request) {
 		ID:      id,
 		Type:    "request",
 		Method:  r.Method,
-		Path:    r.URL.Path,
+		Path:    r.URL.RequestURI(),
 		Headers: make(map[string]string),
 		Body:    body,
 	}
