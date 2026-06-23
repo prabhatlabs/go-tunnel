@@ -2,14 +2,13 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 	"sync"
 
 	"github.com/gorilla/websocket"
 )
 
 type Server struct {
-	Port     int
+	Port     string
 	Secret   string
 	mu       sync.Mutex
 	mux      *http.ServeMux
@@ -17,7 +16,7 @@ type Server struct {
 	tunnel   *Tunnel
 }
 
-func New(port int, secret string) *Server {
+func New(port string, secret string) *Server {
 	svr := &Server{
 		Port:   port,
 		Secret: secret,
@@ -75,8 +74,8 @@ func (s *Server) closeTunnel() {
 
 func (s *Server) Run() error {
 	p := s.Port
-	if p == 0 {
-		p = 8080
+	if p == "" {
+		p = "8080"
 	}
-	return http.ListenAndServe(":"+strconv.Itoa(p), s.mux)
+	return http.ListenAndServe(":"+p, s.mux)
 }
