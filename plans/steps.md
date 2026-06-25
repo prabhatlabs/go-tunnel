@@ -14,7 +14,7 @@
 
 ## Phase 3 — Server (`cmd/server/` + `internal/server/`)
 
-- [x] CLI flags: `--port`, `--secret`
+- [x] Environment variables: `PORT`, `SECRET` (loaded via `godotenv` from `.env`)
 - [x] WebSocket upgrade handler on `/__tunnel__` with secret auth check
 - [x] Tunnel manager: track single active client, reject duplicates (409)
 - [x] Proxy handler: capture incoming HTTP, send via WS, wait on channel, respond

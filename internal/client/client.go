@@ -25,7 +25,7 @@ func New(serverUrl string, port int, secret string) *Client {
 }
 
 func (c *Client) connect() (*websocket.Conn, error) {
-	serverUrl := "ws://" + c.ServerUrl + "/__tunnel__"
+	serverUrl := c.ServerUrl + "/__tunnel__"
 
 	headers := make(http.Header)
 	headers.Add("X-Tunnel-Secret", c.Secret)

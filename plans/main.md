@@ -85,7 +85,7 @@ A shared secret is used to authenticate the client during the WebSocket handshak
 - The client sends the secret as a custom HTTP header during the upgrade request: `X-Tunnel-Secret: <secret>`
 - The server checks this header before completing the upgrade
 - If missing or wrong → `401` and connection closed
-- Secret is configured via CLI flag on both sides (`--secret`)
+- Server reads secret from `SECRET` env var (via `.env`); client uses `--secret` CLI flag
 
 No token rotation, no expiry — kept intentionally simple. The operator is responsible for choosing a strong secret.
 
@@ -156,12 +156,14 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 
 ---
 
-## Server — CLI flags
+## Server — Environment Variables
 
-| Flag | Default | Description |
+| Variable | Default | Description |
 |---|---|---|
-| `--port` | `8080` | Port to listen on for HTTP traffic |
-| `--secret` | — | Shared secret to authenticate the client |
+| `PORT` | `8080` | Port to listen on for HTTP traffic |
+| `SECRET` | — | Shared secret to authenticate the client |
+
+Loaded from `.env` via `godotenv` at startup. No CLI flags — all server config is env-based.
 
 ---
 
@@ -224,7 +226,7 @@ No token rotation, no expiry — kept intentionally simple. The operator is resp
 
 - Deploy `cmd/server` as a Web Service on Render
 - Render provides HTTPS + a public URL automatically
-- Set `--secret` as an environment variable on Render
+- Set `PORT` and `SECRET` as environment variables on Render
 - The client points `--server` to the Render-provided `wss://` URL
 - Render's free tier keeps the service alive as long as traffic comes in; the client's reconnect logic handles any cold starts
 
@@ -239,8 +241,11 @@ go build -o bin/server ./cmd/server
 # Build client
 go build -o bin/client ./cmd/client
 
-# Run server
-./bin/server --port 8080 --secret mysecret
+# Run server (requires .env with PORT and SECRET)
+./bin/server
+
+# Or with inline env vars
+PORT=8080 SECRET=mysecret ./bin/server
 
 # Run client
 ./bin/client --server wss://myapp.onrender.com/__tunnel__ --port 3000 --secret mysecret

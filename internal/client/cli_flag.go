@@ -7,7 +7,7 @@ import (
 )
 
 func GetFlags() (string, int, string) {
-	serverUrlPtr := flag.String("server", "", "Server url")
+	serverUrlPtr := flag.String("server", "", "Server URL (e.g. ws://localhost:8080 or wss://myapp.onrender.com)")
 	portPtr := flag.Int("port", 0, "Port on which local service running")
 	secretPtr := flag.String("secret", "", "Secret for the server")
 	flag.Parse()

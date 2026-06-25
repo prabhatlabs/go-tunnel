@@ -35,18 +35,23 @@ Start a local HTTP service to forward to:
 python3 -m http.server 3000
 ```
 
-Build and run the server:
+Build and run the server (configured via `.env` or inline env vars):
 
 ```sh
 go build -o bin/server ./cmd/server
-./bin/server --port 8080 --secret mysecret
+
+# With .env file
+./bin/server
+
+# Or with inline env vars
+PORT=8080 SECRET=mysecret ./bin/server
 ```
 
 In another terminal, run the client:
 
 ```sh
 go build -o bin/client ./cmd/client
-./bin/client --server localhost:8080 --port 3000 --secret mysecret
+./bin/client --server ws://localhost:8080 --port 3000 --secret mysecret
 ```
 
 Now hit the server — requests should forward through the tunnel to the local service:
