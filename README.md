@@ -177,9 +177,15 @@ A shared secret authenticates the client during the WebSocket handshake:
 ## Deployment (Render)
 
 1. Deploy `cmd/server` as a Web Service on Render.
-2. Set `PORT` and `SECRET` as environment variables in the Render dashboard.
-3. Render provides HTTPS + a public URL automatically.
-4. Point the client to the Render-provided `wss://` URL:
+2. Use the following **Build Command** in the Render dashboard:
+
+   ```sh
+   go build -tags netgo -ldflags '-s -w' -o app ./cmd/server
+   ```
+
+3. Set `PORT` and `SECRET` as environment variables in the Render dashboard.
+4. Render provides HTTPS + a public URL automatically.
+5. Point the client to the Render-provided `wss://` URL:
 
 ```sh
 ./bin/client --server wss://myapp.onrender.com --port 3000 --secret my-strong-secret
